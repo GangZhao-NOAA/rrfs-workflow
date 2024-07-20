@@ -536,6 +536,18 @@ module list
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
 
+#=======================================================================================#
+# (This is just an ad hoc way. When model lib is updated, then no need to do this.)
+# modifying atmos_model.F90 
+# set -x
+# cd ${SORC_DIR}/ufs-weather-model/FV3
+# [[ -f ./atmos_model.F90.orig ]] || cp -p ./atmos_model.F90 ./atmos_model.F90.orig
+# sed -i 's/close_file, //g'         ./atmos_model.F90
+# sed -i 's/call close_file/close/g' ./atmos_model.F90
+# cd ${BUILD_DIR}
+# set +x
+#=======================================================================================#
+
 if [ "${CLEAN}" = true ]; then
     if [ -f $PWD/Makefile ]; then
        printf "... Clean executables ...\n"
