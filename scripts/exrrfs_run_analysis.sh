@@ -327,8 +327,8 @@ ifsatbufr=.false.
 ifsoilnudge=.false.
 ifhyb=.false.
 miter=2
-niter1=50
-niter2=50
+niter1=${niter1:-50}
+niter2=${niter2:-50}
 lread_obs_save=.false.
 lread_obs_skip=.false.
 if_model_dbz=.false.
@@ -755,6 +755,23 @@ OZINFO=${FIX_GSI}/global_ozinfo.txt
 PCPINFO=${FIX_GSI}/global_pcpinfo.txt
 ATMS_BEAMWIDTH=${FIX_GSI}/atms_beamwidth.txt
 
+# If doing the analysis of wave height (HOWV) and wind gust (GUST) in 3DRTMA
+if [[ "${NET}" == "RTMA"* ]] && [[ "${MACHINE,,}" == "wcoss2" ]] ; then
+   if [[ "${DO_HOWV^^}" == "TRUE" ]] && [[ "${DO_GUST^^}" == "TRUE" ]]; then
+      ANAVINFO=${FIX_GSI2}/${ANAVINFO_HOWVGUST_FN}
+      CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
+   elif [[ "${DO_HOWV^^}" == "TRUE" ]] && [[ "${DO_GUST^^}" == "FALSE" ]]; then
+      ANAVINFO=${FIX_GSI2}/${ANAVINFO_HOWV_FN}
+      CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
+   elif [[ "${DO_HOWV^^}" == "FALSE" ]] && [[ "${DO_GUST^^}" == "TRUE" ]]; then
+      ANAVINFO=${FIX_GSI2}/${ANAVINFO_GUST_FN}
+      CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
+   else
+      ANAVINFO=${FIX_GSI}/${ANAVINFO_FN}
+      CONVINFO=${FIX_GSI}/${CONVINFO_FN}
+   fi
+fi
+
 # Fixed fields
 cp ${ANAVINFO} anavinfo
 cp ${BERROR}   berror_stats
@@ -1000,7 +1017,21 @@ else
   n_iolayouty=$(($IO_LAYOUT_Y))
 fi
 
-. ${FIX_GSI}/gsiparm.anl.sh
+if [[ "${NET}" == "RTMA"* ]] && [[ "${MACHINE,,}" == "wcoss2" ]] ; then 
+#  changing the static BE and OE for howv and gust in 3DRTMA hybrid EnVar run
+   if [[ "${ifhyb}" == ".false." ]] || [[ "${ifhyb}" == ".FALSE." ]] ; then
+      export corp_howv=${corp_howv0}
+      export corp_gust=${corp_gust0}
+   else
+      tmpvar=$( echo "scale=4; ${corp_howv0} * sqrt(( 1.0 / ${beta1_inv}))" | bc )
+      export corp_howv="${tmpvar}"            #changing static BE of howv if hybrid run with readin_local=False
+      tmpvar=$( echo "scale=4; ${corp_gust0} * sqrt(( 1.0 / ${beta1_inv}))" | bc )
+      export corp_gust="${tmpvar}"            #changing static BE of gust if hybrid run with readin_local=False
+   fi
+   . ${FIX_GSI2}/gsiparm_howvgust.anl.sh
+else
+   . ${FIX_GSI}/gsiparm.anl.sh
+fi
 cat << EOF > gsiparm.anl
 $gsi_namelist
 EOF
@@ -1071,7 +1102,7 @@ if [ "${DO_GSIDIAG_OFFLINE}" = "FALSE" ]; then
   netcdf_diag=${netcdf_diag:-".false."}
   binary_diag=${binary_diag:-".true."}
 
-  loops="01 03"
+  loops="01 02 03"
   for loop in $loops; do
 
   case $loop in
