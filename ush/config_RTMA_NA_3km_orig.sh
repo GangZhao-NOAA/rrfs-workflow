@@ -76,9 +76,7 @@ RADARREFL_TIMELEVEL=(0)
 #FH_DFI_RADAR="0.0,0.25,0.5"
 DO_SOIL_ADJUST="TRUE"
 DO_RADDA="FALSE"
-DO_BUFRSND="TRUE"
-DO_HOWV="FALSE"
-DO_GUST="FALSE"
+DO_BUFRSND="FALSE"
 #
 #-------------------------------------------------------------------------------------
 #      GSI Namelist parameters configurable across differnt applications
@@ -130,8 +128,8 @@ SFCOBS_USELIST="/lfs4/BMC/amb-verif/rap_ops_mesonet_uselists"
 
 LBC_SPEC_INTVL_HRS="1"
 
-DATE_FIRST_CYCL="20241016"
-DATE_LAST_CYCL="20241017"
+DATE_FIRST_CYCL="20240329"
+DATE_LAST_CYCL="20250331"
 CYCL_HRS=( "00" "12" )
 CYCL_HRS_SPINSTART=("03" "15")
 CYCL_HRS_PRODSTART=("99") # RTMA always warm-starts
@@ -229,8 +227,6 @@ MODEL="RTMA_B" #used by NCL
 RUN="RTMA_NA"
 #RTMA_OBS_FEED="NCO"
 #OBSPATH="/lfs4/BMC/wrfruc/gge/rtma/wcoss_obs"
-RRFS_PRODROOT="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"      # <-- on wcoss2 (need to change if on other machines)
-COMIN_prod_rrfs="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"      # <-- on wcoss2 (need to change if on other machines)
 
 STMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/stmp"
 PTMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/com" 
@@ -258,7 +254,7 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
   PARTITION_GRAPHICS=""
   PARTITION_POST=""
   PARTITION_PRDGEN=""
-  DO_BUFRSND="TRUE"
+  DO_BUFRSND="FALSE"
 # RTMA_OBS_FEED="NCO" # comment out as RTMA will try to use the rtma_ru obs if set to NCO (wcoss2)
   binary_diag=.true.
 
@@ -302,18 +298,12 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
   WRTCMP_write_tasks_per_group="128"
 
   FG_ROOTDIR="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/nwges"
-  OBSPATH="/lfs/h1/ops/prod/com/obsproc/v1.2"
+  OBSPATH="/lfs/h1/ops/prod/com/obsproc/v1.1"
   ENKF_FCST="/lfs/h1/ops/prod/com/gfs/v16.3"
-  LIGHTNING_ROOT="/lfs/h1/ops/prod/com/obsproc/v1.2"
-  RRFS_PRODROOT="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"
-  COMIN_prod_rrfs="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"
+  LIGHTNING_ROOT="/lfs/h1/ops/prod/com/obsproc/v1.1"
 
   STMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}/stmp"
   PTMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}"
   NWGES="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}/nwges"
-
-  DO_HOWV="TRUE"
-  DO_GUST="TRUE"
-
 fi
 

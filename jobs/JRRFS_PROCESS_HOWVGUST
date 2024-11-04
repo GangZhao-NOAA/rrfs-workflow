@@ -4,8 +4,8 @@
 #-----------------------------------------------------------------------
 #
 # This J-JOB script runs the preprocess of retrieving the firstguess of 
-# ocean signifcant wave height (aka HOWV) field from WW3 forecasts
-# (script originally based on JURMA_GETGUESS of 2DURMA)
+# ocean signifcant wave height (HOWV) and 10-m wind-gust (GUST) field
+# from WW3 forecasts (script originally based on JURMA_GETGUESS of 2DURMA)
 #
 #-----------------------------------------------------------------------
 #
@@ -56,7 +56,8 @@ Entering script:  \"${scrfunc_fn}\"
 In directory:     \"${scrfunc_dir}\"
 
 This is the J-job script for the task that runs an ocean significant wave
-height (aka howv) preprocess with FV3-LAM for the specified cycle.
+height (howv) and 10-m wind gust (gust) preprocess with FV3-LAM for the 
+specified cycle.
 ========================================================================"
 #
 #-----------------------------------------------------------------------
@@ -67,6 +68,10 @@ height (aka howv) preprocess with FV3-LAM for the specified cycle.
 #
 export COMINww3GL=/lfs/h1/ops/prod/com/glwu/v2.0                                 # v1.1 is old
 export COMINww3=/lfs/h1/ops/prod/com/gfs/v16.3                                   # v16.2 is old
+
+# check the path to RRFS prod
+export RRFS_PRODROOT=${RRFS_PRODROOT:-/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod}
+export COMIN_prod_rrfs=${COMIN_prod_rrfs:-/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod}
 
 # path to the scripts
 export HOMEscript=${SCRIPTSdir}
@@ -116,7 +121,7 @@ mkdir -p "${COMOUT}"
 export pgmout="${workdir}/OUTPUT.$$"
 env
 
-$SCRIPTSdir/exrrfs_process_howv.sh \
+$SCRIPTSdir/exrrfs_process_howvgust.sh \
   CYCLE_DIR="${CYCLE_DIR}"
 export err=$?; err_chk
 

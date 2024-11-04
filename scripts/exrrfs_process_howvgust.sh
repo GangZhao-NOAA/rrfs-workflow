@@ -43,8 +43,8 @@ Entering script:  \"${scrfunc_fn}\"
 In directory:     \"${scrfunc_dir}\"
 
 This is the ex-script for the task that runs the preprocess of retrieving
-the firstguess of ocean signifcant wave height (aka HOWV) field from WW3
-forecasts with FV3 for the specified cycle.
+the firstguess of ocean signifcant wave height (HOWV) and 10-m wind-gust
+ (GUST)field from WW3 forecasts with FV3 for the specified cycle.
 ========================================================================"
 #
 #-----------------------------------------------------------------------
