@@ -132,6 +132,12 @@ YYJJJHH=$(date +"%y%j%H" -d "${START_DATE}")
 PREYYJJJHH=$(date +"%y%j%H" -d "${START_DATE} 1 hours ago")
 
 CDATEymdh=${YYYYMMDDHH}
+
+FCST_DATE=$(date +"%Y%m%d%H" -d "${START_DATE} 1 hours ago")
+PRE_YYYYMMDDHH=$(date +"%Y%m%d%H" -d "${START_DATE} 1 hour ago")
+PRE_YYYYMMDD=$(echo ${PRE_YYYYMMDDHH} | cut -c1-8)
+PRE_HH=$(echo ${PRE_YYYYMMDDHH} | cut -c9-10)
+
 #
 #-----------------------------------------------------------------------
 #
@@ -165,7 +171,7 @@ grid_specs=${grid_specs_rrfsnarll}
 #
 #-----------------------------------------------------------------------
 #
-# Look for the WW3-first guess 
+# Look for the WW3-firstguess for ocean significant wave height (HOWV)
 #
 #-----------------------------------------------------------------------
 #
@@ -274,6 +280,24 @@ queried in the above while-do-loop."
    fi
 
    cp -p ww3.guess.grb2 $COMOUT/rrfs.t${HH}z.ww3.guess.3drtma.grb2
+#
+#-----------------------------------------------------------------------
+#
+# looking for firstguess of Wind Gust (from 1-h forecast grib2 file of RRFS)
+#
+#-----------------------------------------------------------------------
+#
+   rrfs_f01_grb2=${RRFS_PRODROOT}/rrfs.${PRE_YYYYMMDD}/${PRE_HH}/rrfs.t${PRE_HH}z.prslev.f001.grib2
+   if [[ -f ${rrfs_f01_grb2} ]] ; then 
+      print_info_msg "VERBOSE" "found RRFS 1-hour forecast grib2 file ${rrfs_f01_grb2} and retrieve 10-m Wind Gust from it: "
+      ln -sf ${rrfs_f01_grb2}   ./rrfs_f001.grib2
+      wgrib2 ./rrfs_f001.grib2 | grep "GUST" | wgrib2 -i ./rrfs_f001.grib2 -grib ./rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
+      # wgrib2 ./rrfs_f001.grib2 -match ":GUST:" -grib ./rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
+      export err=$?; err_chk
+      cp -p ./rrfs_t${PRE_HH}z.gust.sfc.f001.grib2 $COMOUT/rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
+   else
+      err_exit "Could NOT find RRFS 1-hour forecast grib2 file ${rrfs_f01_grb2}, exit with error.  "
+   fi
 
 ###################################################################################
 #
@@ -285,7 +309,7 @@ queried in the above while-do-loop."
 #
 print_info_msg "
 ========================================================================
-Retrieving WW3 GUESS PROCESS completed successfully!!!
+Retrieving WW3 GUESS for HOWV AND RRFS GUESS for GUST PROCESS completed successfully!!!
 
 Exiting script:  \"${scrfunc_fn}\"
 In directory:    \"${scrfunc_dir}\"
