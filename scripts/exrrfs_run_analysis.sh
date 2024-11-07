@@ -755,20 +755,37 @@ OZINFO=${FIX_GSI}/global_ozinfo.txt
 PCPINFO=${FIX_GSI}/global_pcpinfo.txt
 ATMS_BEAMWIDTH=${FIX_GSI}/atms_beamwidth.txt
 
-# If doing the analysis of wave height (HOWV) and wind gust (GUST) in 3DRTMA
-if [[ "${NET}" == "RTMA"* ]] && [[ "${MACHINE,,}" == "wcoss2" ]] ; then
-   if [[ "${DO_HOWV^^}" == "TRUE" ]] && [[ "${DO_GUST^^}" == "TRUE" ]]; then
+# If doing the analysis of wave height (HOWV) and/or wind gust (GUST) in 3DRTMA
+if [[ ${BKTYPE} -eq 0 ]] && [[ "${IO_LAYOUT_Y}" == "1" ]] && [[ "${NET}" == "RTMA"* ]] ; then
+   # testing if howv exists in firstguess sfc_data.nc (with ncdump)
+   i_found_howv=0
+   i_found_howv=$(ncdump -h ${bkpath}/sfc_data.nc | grep -i howv | wc -l) 
+   if [[ "${i_found_howv}" -eq 1 ]] && [[ "${DO_HOWV^^}" == "TRUE" ]] && [[ "${MACHINE,,}" == "wcoss2" ]] ; then
+      RUN_HOWV="TRUE"
+   else
+      RUN_HOWV="FALSE"
+   fi
+   # testing if gust exists in firstguess sfc_data.nc (with ncdump)
+   i_found_gust=0
+   i_found_gust=$(ncdump -h ${bkpath}/sfc_data.nc | grep -i gust | wc -l) 
+   if [[ "${i_found_gust}" -eq 1 ]] && [[ "${DO_GUST^^}" == "TRUE" ]]; then
+      RUN_GUST="TRUE"
+   else
+      RUN_GUST="FALSE"
+   fi
+      
+   if [[ "${RUN_HOWV^^}" == "TRUE" ]] && [[ "${RUN_GUST^^}" == "TRUE" ]]; then
       ANAVINFO=${FIX_GSI2}/${ANAVINFO_HOWVGUST_FN}
       CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
-   elif [[ "${DO_HOWV^^}" == "TRUE" ]] && [[ "${DO_GUST^^}" == "FALSE" ]]; then
+      print_info_msg "$VERBOSE" "running GSI with analysis of ocean significant wave height (HOWV) and 10-m wind gust (GUST)."
+   elif [[ "${RUN_HOWV^^}" == "TRUE" ]] && [[ "${RUN_GUST^^}" == "FALSE" ]]; then
       ANAVINFO=${FIX_GSI2}/${ANAVINFO_HOWV_FN}
       CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
-   elif [[ "${DO_HOWV^^}" == "FALSE" ]] && [[ "${DO_GUST^^}" == "TRUE" ]]; then
+      print_info_msg "$VERBOSE" "running GSI with analysis of ocean significant wave height (HOWV)."
+   elif [[ "${RUN_HOWV^^}" == "FALSE" ]] && [[ "${RUN_GUST^^}" == "TRUE" ]]; then
       ANAVINFO=${FIX_GSI2}/${ANAVINFO_GUST_FN}
       CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
-   else
-      ANAVINFO=${FIX_GSI}/${ANAVINFO_FN}
-      CONVINFO=${FIX_GSI}/${CONVINFO_FN}
+      print_info_msg "$VERBOSE" "running GSI with analysis of 10-m wind gust (GUST)."
    fi
 fi
 

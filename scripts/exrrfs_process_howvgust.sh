@@ -291,10 +291,10 @@ queried in the above while-do-loop."
    if [[ -f ${rrfs_f01_grb2} ]] ; then 
       print_info_msg "VERBOSE" "found RRFS 1-hour forecast grib2 file ${rrfs_f01_grb2} and retrieve 10-m Wind Gust from it: "
       ln -sf ${rrfs_f01_grb2}   ./rrfs_f001.grib2
-      wgrib2 ./rrfs_f001.grib2 | grep "GUST" | wgrib2 -i ./rrfs_f001.grib2 -grib ./rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
-      # wgrib2 ./rrfs_f001.grib2 -match ":GUST:" -grib ./rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
+      # wgrib2 ./rrfs_f001.grib2 | grep "GUST" | wgrib2 -i ./rrfs_f001.grib2 -grib ./gust.guess.grib2
+      wgrib2 ./rrfs_f001.grib2 -match ":GUST:surface" -grib ./gust.guess.grib2
       export err=$?; err_chk
-      cp -p ./rrfs_t${PRE_HH}z.gust.sfc.f001.grib2 $COMOUT/rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
+      cp -p ./gust.guess.grib2    $COMOUT/rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
    else
       err_exit "Could NOT find RRFS 1-hour forecast grib2 file ${rrfs_f01_grb2}, exit with error.  "
    fi
