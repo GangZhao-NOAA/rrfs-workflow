@@ -775,16 +775,16 @@ if [[ ${BKTYPE} -eq 0 ]] && [[ "${IO_LAYOUT_Y}" == "1" ]] && [[ "${NET}" == "RTM
    fi
       
    if [[ "${RUN_HOWV^^}" == "TRUE" ]] && [[ "${RUN_GUST^^}" == "TRUE" ]]; then
-      ANAVINFO=${FIX_GSI2}/${ANAVINFO_HOWVGUST_FN}
-      CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
+      ANAVINFO=${FIX_GSI}/${ANAVINFO_HOWVGUST_FN}
+      CONVINFO=${FIX_GSI}/${CONVINFO_HOWVGUST_FN}
       print_info_msg "$VERBOSE" "running GSI with analysis of ocean significant wave height (HOWV) and 10-m wind gust (GUST)."
    elif [[ "${RUN_HOWV^^}" == "TRUE" ]] && [[ "${RUN_GUST^^}" == "FALSE" ]]; then
-      ANAVINFO=${FIX_GSI2}/${ANAVINFO_HOWV_FN}
-      CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
+      ANAVINFO=${FIX_GSI}/${ANAVINFO_HOWV_FN}
+      CONVINFO=${FIX_GSI}/${CONVINFO_HOWV_FN}
       print_info_msg "$VERBOSE" "running GSI with analysis of ocean significant wave height (HOWV)."
    elif [[ "${RUN_HOWV^^}" == "FALSE" ]] && [[ "${RUN_GUST^^}" == "TRUE" ]]; then
-      ANAVINFO=${FIX_GSI2}/${ANAVINFO_GUST_FN}
-      CONVINFO=${FIX_GSI2}/${CONVINFO_HOWVGUST_FN}
+      ANAVINFO=${FIX_GSI}/${ANAVINFO_GUST_FN}
+      CONVINFO=${FIX_GSI}/${CONVINFO_GUST_FN}
       print_info_msg "$VERBOSE" "running GSI with analysis of 10-m wind gust (GUST)."
    fi
 fi
@@ -1034,7 +1034,11 @@ else
   n_iolayouty=$(($IO_LAYOUT_Y))
 fi
 
-if [[ "${NET}" == "RTMA"* ]] && [[ "${MACHINE,,}" == "wcoss2" ]] ; then 
+#-- generating the gsi namelist on the fly
+if [[ "${NET}" == "RTMA"* ]] ; then
+# if [[ "${RUN_HOWV^^}" == "TRUE" ]] || [[ "${RUN_GUST^^}" == "TRUE" ]]; then
+   print_info_msg "VERBOSE" "generating the GSI namelist for running ${NET}"
+
 #  changing the static BE and OE for howv and gust in 3DRTMA hybrid EnVar run
    if [[ "${ifhyb}" == ".false." ]] || [[ "${ifhyb}" == ".FALSE." ]] ; then
       export corp_howv=${corp_howv0}
@@ -1045,9 +1049,12 @@ if [[ "${NET}" == "RTMA"* ]] && [[ "${MACHINE,,}" == "wcoss2" ]] ; then
       tmpvar=$( echo "scale=4; ${corp_gust0} * sqrt(( 1.0 / ${beta1_inv}))" | bc )
       export corp_gust="${tmpvar}"            #changing static BE of gust if hybrid run with readin_local=False
    fi
-   . ${FIX_GSI2}/gsiparm_howvgust.anl.sh
+   . ${FIX_GSI}/gsiparm_howvgust.anl.sh
+
 else
+
    . ${FIX_GSI}/gsiparm.anl.sh
+
 fi
 cat << EOF > gsiparm.anl
 $gsi_namelist
