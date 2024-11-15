@@ -90,7 +90,7 @@ if [ "${CYCLE_TYPE}" = "spinup" ]; then
 else
   export workdir=${CYCLE_DIR}/process_howvgust
   if [ "${DO_ENSEMBLE}" = "TRUE" ]; then
-    workdir=${CYCLE_DIR}/process_howvfgust_enkf
+    workdir=${CYCLE_DIR}/process_howvgust_enkf
   fi
 fi
 rm -fr ${workdir}

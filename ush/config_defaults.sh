@@ -337,6 +337,8 @@ ENSCTRL_PTMP="/base/path/of/directory/containing/postprocessed/output/files"
 NWGES="/base/path/of/directory/containing/model/output/files"
 ENSCTRL_NWGES="/base/path/of/directory/containing/model/restart/files"
 RRFSE_NWGES="/base/path/of/directory/containing/model/output/files"
+RRFS_PRODROOT="base/path/of/directory/contraining/model/product/files/in/grib2/format"
+COMIN_prod_rrfs="base/path/of/directory/contraining/model/product/files/in/grib2/format"
 
 ARCHIVEDIR="/5year/BMC/wrfruc/rrfs_dev1"
 NCARG_ROOT="/apps/ncl/6.5.0-CentOS6.10_64bit_nodap_gnu447"
@@ -719,6 +721,7 @@ bkgerr_hzscl=0.7,1.4,2.80   #no trailing ,
 usenewgfsberror=.true.
 netcdf_diag=.false.
 binary_diag=.true.
+verbose_gsi=.false.            # running GSI with necessary (not verbose) print-out in log file
 
 # &HYBRID_ENSEMBLE
 l_both_fv3sar_gfs_ens=.false.
@@ -757,6 +760,11 @@ i_T_Q_adjust=1
 l_rtma3d=.false.
 i_precip_vertical_check=0
 l_cld_uncertainty=.false.
+oerr_gust="-1.0"                 #Obs Err of gust (if<0, use preset value 1.0 defined in read_prepbufr.f90)
+corp_howv0="0.42"                #static BE of howv (0.42 is tuned for pure 3DVar, needs to be changed in hyrid run)
+corp_gust0="3.0"                 #static BE of gust (if<0, use preset 3.0 defined in gsi code)
+hwllp_howv="90000.0"             #static BE de-correlation length scale of howv (if<0, using default preset value in GSI code --> hwllp of q at level 1, which is too short)
+hwllp_gust="90000.0"             #static BE de-correlation length scale of gust (if <0, using default preset value in GSI)
 #  &CHEM 
 laeroana_fv3smoke=.false.
 berror_fv3_cmaq_regional=.false.
@@ -772,10 +780,16 @@ ANAVINFO_DBZ_FN="anavinfo.rrfs_dbz"
 ANAVINFO_CONV_DBZ_FN="anavinfo.rrfs_conv_dbz"
 ANAVINFO_CONV_DBZ_FED_FN="anavinfo.rrfs_conv_dbz_fed"
 ANAVINFO_DBZ_FED_FN="anavinfo.rrfs_dbz_fed"
+ANAVINFO_HOWV_FN="anavinfo.rrfs_howv"
+ANAVINFO_GUST_FN="anavinfo.rrfs_gust"
+ANAVINFO_HOWVGUST_FN="anavinfo.rrfs_howvgust"
 ENKF_ANAVINFO_FN="anavinfo.rrfs"
 ENKF_ANAVINFO_DBZ_FN="anavinfo.enkf.rrfs_dbz"
 CONVINFO_FN="convinfo.rrfs"
 CONVINFO_SD_FN="convinfo.rrfs_sd"
+CONVINFO_HOWV_FN="convinfo.rtma_howv"
+CONVINFO_GUST_FN="convinfo.rtma_gust"
+CONVINFO_HOWVGUST_FN="convinfo.rtma_howvgust"
 BERROR_FN="rap_berror_stats_global_RAP_tune" #under $FIX_GSI
 BERROR_SD_FN="berror.rrfs_sd" # for test only
 OBERROR_FN="errtable.rrfs"
@@ -2316,6 +2330,12 @@ USE_HOST_ENKF="TRUE"
 # DO_NON_DA_RUN:
 # Flag that determines whether to run non-DA case.
 #
+# DO_HOWV: (FALSE or TRUE)
+# Flag that determines whether to run analysis of ocean significant wave height (HOWV)
+#
+# DO_GUST: (FALSE or TRUE)
+# Flag that determines whether to run analysis of 10-m wind gust (GUST)
+#
 #-----------------------------------------------------------------------
 #
 DO_DACYCLE="FALSE"
@@ -2331,6 +2351,8 @@ EBB_DCYCLE="2"
 DO_PM_DA="FALSE"
 USE_CLM="FALSE"
 DO_NON_DA_RUN="FALSE"
+DO_HOWV="FALSE"
+DO_GUST="FALSE"
 #
 #-----------------------------------------------------------------------
 #

@@ -134,9 +134,6 @@ PREYYJJJHH=$(date +"%y%j%H" -d "${START_DATE} 1 hours ago")
 CDATEymdh=${YYYYMMDDHH}
 
 FCST_DATE=$(date +"%Y%m%d%H" -d "${START_DATE} 1 hours ago")
-PRE_YYYYMMDDHH=$(date +"%Y%m%d%H" -d "${START_DATE} 1 hour ago")
-PRE_YYYYMMDD=$(echo ${PRE_YYYYMMDDHH} | cut -c1-8)
-PRE_HH=$(echo ${PRE_YYYYMMDDHH} | cut -c9-10)
 
 #
 #-----------------------------------------------------------------------
@@ -177,8 +174,8 @@ grid_specs=${grid_specs_rrfsnarll}
 #
 #
 #  Mask for the correct interpolation of the howv Background.
-# ???? ----> need to find slmask.grb2 for NA-3km RLL grid
-#       cp $FIXurma/${RUN}_slmask_nolakes.grb2 slmask.grb2
+# ???? ----> need to find slmask.grib2 for NA-3km RLL grid
+#       cp $FIXurma/${RUN}_slmask_nolakes.grib2 slmask.grib2
 #
 # Wave Background at Great Lakes
   print_info_msg "$VERBOSE" "COMINww3GL is $COMINww3GL (Wave background from Great Lakes model)"
@@ -197,17 +194,17 @@ grid_specs=${grid_specs_rrfsnarll}
       if [ -s $probe_ww3_GL_guess_grb2 ]; then
 
          print_info_msg "$VERBOSE" "found wave background for Great Lakes: $probe_ww3_GL_guess_grb2"
-         cpreq $probe_ww3_GL_guess_grb2 ww3.guess5.grb2
-#        cp -p $probe_ww3_GL_guess_grb2 ww3.guess5.grb2
+         cpreq $probe_ww3_GL_guess_grb2 ww3.guess5.grib2
+#        cp -p $probe_ww3_GL_guess_grb2 ww3.guess5.grib2
          cp -p $probe_ww3_GL_guess_grb2 $COMOUT/glwu.grlr_500m.t${ww3CC_GL}z.grib2     # save for retro run
          if [ $ic == 0 ]; then
             FHH_st="(HTSGW:surface:anl)"
          else
             FHH_st="(HTSGW:surface:$ic hour fcst)"
          fi
-         $WGRIB2 ww3.guess5.grb2 -match "${FHH_st}" -grib ww3GL.guess.grb2
+         $WGRIB2 ww3.guess5.grib2 -match "${FHH_st}" -grib ww3GL.guess.grib2
 
-         GL_InputGribmerge=' -i ww3GL.guess.grb2 '
+         GL_InputGribmerge=' -i ww3GL.guess.grib2 '
 
 #        echo "export ww3CYCLE_GL=$ww3CYCLE_GL" >> $COMOUT/urma2p5.t${cyc}z.envir.sh
 #        echo "export ww3FHH_GL=$ww3FHH_GL" >> $COMOUT/urma2p5.t${cyc}z.envir.sh
@@ -251,18 +248,18 @@ grid_specs=${grid_specs_rrfsnarll}
 
          print_info_msg "$VERBOSE" "found wave background for Arctic: ${probe_ww3_guess_grb2[0]}"
          print_info_msg "$VERBOSE" "found wave background for Global: ${probe_ww3_guess_grb2[1]}"
-         cpreq ${probe_ww3_guess_grb2[0]} ww3.guess0.grb2
-#        cp -p ${probe_ww3_guess_grb2[0]} ww3.guess0.grb2
-         cpreq ${probe_ww3_guess_grb2[1]} ww3.guess1.grb2
-#        cp -p ${probe_ww3_guess_grb2[1]} ww3.guess1.grb2
+         cpreq ${probe_ww3_guess_grb2[0]} ww3.guess0.grib2
+#        cp -p ${probe_ww3_guess_grb2[0]} ww3.guess0.grib2
+         cpreq ${probe_ww3_guess_grb2[1]} ww3.guess1.grib2
+#        cp -p ${probe_ww3_guess_grb2[1]} ww3.guess1.grib2
 
          cp -p ${probe_ww3_guess_grb2[0]} $COMOUT/gfswave.t${ww3CC}z.arctic.9km.f${ww3FHH}.grib2     # save for retro run
          cp -p ${probe_ww3_guess_grb2[1]} $COMOUT/gfswave.t${ww3CC}z.global.0p16.f${ww3FHH}.grib2     # save for retro run
 
-         ${HOMEscript}/exrrfs_GribMerge_urma.sh ${GL_InputGribmerge} -i ww3.guess0.grb2 -i ww3.guess1.grb2 \
+         ${HOMEscript}/exrrfs_GribMerge_urma.sh ${GL_InputGribmerge} -i ww3.guess0.grib2 -i ww3.guess1.grib2 \
                         -v HTSGW -g "${grid_specs}" \
-                        -m slmask.grb2 \
-                        -o ww3.guess.grb2
+                        -m slmask.grib2 \
+                        -o ww3.guess.grib2
  
 #        echo "export ww3CYCLE=$ww3CYCLE" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
 #        echo "export ww3FHH=$ww3FHH" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
@@ -279,7 +276,8 @@ gfs.${ww3PDY}/${ww3CC}/wave/gridded/gfswave.t${ww3CC}z.global.0p16.f${ww3FHH}.gr
 queried in the above while-do-loop."
    fi
 
-   cp -p ww3.guess.grb2 $COMOUT/rrfs.t${HH}z.ww3.guess.3drtma.grb2
+   # cp -p ww3.guess.grib2 $COMOUT/rrfs.t${HH}z.ww3.guess.3drtma.grib2
+   cp -p ww3.guess.grib2 $COMOUT/rrfs.3drtma.t${HH}z.fgs.howv.grib2
 #
 #-----------------------------------------------------------------------
 #
@@ -287,16 +285,40 @@ queried in the above while-do-loop."
 #
 #-----------------------------------------------------------------------
 #
-   rrfs_f01_grb2=${RRFS_PRODROOT}/rrfs.${PRE_YYYYMMDD}/${PRE_HH}/rrfs.t${PRE_HH}z.prslev.f001.grib2
-   if [[ -f ${rrfs_f01_grb2} ]] ; then 
-      print_info_msg "VERBOSE" "found RRFS 1-hour forecast grib2 file ${rrfs_f01_grb2} and retrieve 10-m Wind Gust from it: "
-      ln -sf ${rrfs_f01_grb2}   ./rrfs_f001.grib2
-      # wgrib2 ./rrfs_f001.grib2 | grep "GUST" | wgrib2 -i ./rrfs_f001.grib2 -grib ./gust.guess.grib2
-      wgrib2 ./rrfs_f001.grib2 -match ":GUST:surface" -grib ./gust.guess.grib2
-      export err=$?; err_chk
-      cp -p ./gust.guess.grib2    $COMOUT/rrfs_t${PRE_HH}z.gust.sfc.f001.grib2
-   else
-      err_exit "Could NOT find RRFS 1-hour forecast grib2 file ${rrfs_f01_grb2}, exit with error.  "
+   found_gustges=no
+   ic=0
+   while [ $ic -le 3 ] ; do
+      PRE_YYYYMMDDHH=$(date +"%Y%m%d%H" -d "${START_DATE} ${ic} hour ago")
+      PRE_YYYYMMDD=$(echo ${PRE_YYYYMMDDHH} | cut -c1-8)
+      PRE_HH=$(echo ${PRE_YYYYMMDDHH} | cut -c9-10)
+      ic3=$(printf %03d ${ic})
+      rrfs_guess_grb2=${RRFS_PRODROOT}/rrfs.${PRE_YYYYMMDD}/${PRE_HH}/rrfs.t${PRE_HH}z.prslev.f${ic3}.grib2
+      if [[ -f ${rrfs_guess_grb2} ]] ; then 
+         print_info_msg "VERBOSE" "found RRFS ${ic} hour forecast grib2 file ${rrfs_guess_grb2} and retrieve 10-m Wind Gust from it: "
+         rm -f ./rrfs_guess.grib2
+         ln -sf ${rrfs_guess_grb2}   ./rrfs_guess.grib2
+         if [ $ic == 0 ]; then
+            FHH_string=":GUST:surface:anl:"
+         else
+            FHH_string=":GUST:surface:$ic hour fcst:"
+         fi
+         # wgrib2 ./rrfs_guess.grib2 | grep "GUST" | wgrib2 -i ./rrfs_guess.grib2 -grib ./gust.guess.grib2
+         # wgrib2 ./rrfs_guess.grib2 -match ":GUST:surface" -grib ./gust.guess.grib2
+         wgrib2 ./rrfs_guess.grib2 -match "${FHH_string}" -grib ./gust.guess.grib2
+         export err=$?; err_chk
+         # cp -p ./gust.guess.grib2    $COMOUT/rrfs.t${PRE_HH}z.gust.sfc.f${ic3}.grib2
+         cp -p ww3.guess.grib2 $COMOUT/rrfs.3drtma.t${HH}z.fgs.gust.grib2
+
+         found_gustges=yes
+
+         break
+      else
+         let "ic=ic+1"
+      fi
+   done
+   if [[ "${found_gustges}" == "no" ]] ; then
+      err_exit "Could NOT find RRFS 0-3 hours forecast grib2 file to \
+                provide firstguess for 10-m wind gust.  exit with error.  "
    fi
 
 ###################################################################################

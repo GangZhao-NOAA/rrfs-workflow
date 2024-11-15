@@ -513,8 +513,8 @@ optionList[29]=GLMFED_DATA_MODE
 optionList[30]=DO_IODA_PREPBUFR
 optionList[31]=EBB_DCYCLE
 optionList[32]=PREP_MODEL_FOR_FED
-optionList[33]=DO_HOWV
-optionList[34]=DO_GUST
+# optionList[33]=DO_HOWV
+# optionList[34]=DO_GUST
 
 obs_number=${#optionList[@]}
 for (( i=0; i<${obs_number}; i++ ));
@@ -2474,8 +2474,6 @@ LIGHTNING_ROOT="${LIGHTNING_ROOT}"
 GLMFED_EAST_ROOT="${GLMFED_EAST_ROOT}"
 GLMFED_WEST_ROOT="${GLMFED_WEST_ROOT}"
 ENKF_FCST="${ENKF_FCST}"
-RRFS_PRODROOT="${RRFS_PRODROOT}"
-COMIN_prod_rrfs="${COMIN_prod_rrfs}"
 
 FIX_GSI="${FIX_GSI}"
 FIX_CRTM="${FIX_CRTM}"

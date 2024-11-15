@@ -76,9 +76,9 @@ RADARREFL_TIMELEVEL=(0)
 #FH_DFI_RADAR="0.0,0.25,0.5"
 DO_SOIL_ADJUST="TRUE"
 DO_RADDA="FALSE"
-DO_BUFRSND="TRUE"
-DO_HOWV="FALSE"
-DO_GUST="FALSE"
+DO_BUFRSND="FALSE"
+DO_HOWV="FALSE"        # set TRUE if running GSI with analysis of ocean wave height
+DO_GUST="FALSE"        # set TRUE if running GSI with analysis of 10-m wind gust
 #
 #-------------------------------------------------------------------------------------
 #      GSI Namelist parameters configurable across differnt applications
@@ -97,9 +97,7 @@ write_diag_2=.true.
 bkgerr_vs=0.125                        #1.0 is default setting
 bkgerr_hzscl=0.7,1.4,2.80             #HRRR default: .373,0.746,1.5
 usenewgfsberror=.true.
-
 verbose_gsi=.true.             # running GSI with more print-out in log file
-
 # &HYBRID_ENSEMBLE
 readin_localization=.true.     #if true, it overwrites the "beta1_inv/ens_h/ens_v" setting
 beta1_inv=0.5                  #beata_inv is 1-ensemble_wgt
@@ -120,13 +118,11 @@ i_use_2mT4B=0
 i_T_Q_adjust=1
 l_rtma3d=.true.
 i_precip_vertical_check=3
-#---- special settings for howv and windgust for 3DRTMA run
 oerr_gust="-1.0"                 #Obs Err of gust (if<0, use preset value 1.0 defined in read_prepbufr.f90)
 corp_howv0="0.42"                #static BE of howv (0.42 is tuned for pure 3DVar, needs to be changed in hyrid run)
 corp_gust0="3.0"                 #static BE of gust (if<0, use preset 3.0 defined in gsi code)
 hwllp_howv="90000.0"             #static BE de-correlation length scale of howv (if<0, using default preset value in GSI code --> hwllp of q at level 1, which is too short)
 hwllp_gust="90000.0"             #static BE de-correlation length scale of gust (if <0, using default preset value in GSI)
-
 #-------------------------------------------------------------------------------------
 #
 BERROR_FN="berror.rtma"      #under $FIX_GSI
@@ -145,8 +141,8 @@ SFCOBS_USELIST="/lfs4/BMC/amb-verif/rap_ops_mesonet_uselists"
 
 LBC_SPEC_INTVL_HRS="1"
 
-DATE_FIRST_CYCL="20241016"
-DATE_LAST_CYCL="20241017"
+DATE_FIRST_CYCL="20241114"
+DATE_LAST_CYCL="20241115"
 CYCL_HRS=( "00" "12" )
 CYCL_HRS_SPINSTART=("03" "15")
 CYCL_HRS_PRODSTART=("99") # RTMA always warm-starts
@@ -236,6 +232,8 @@ TAG="RTMA_NA" ## used by job names
 IS_RTMA="TRUE"
 NCORES_PER_NODE=40 #kjet
 FG_ROOTDIR="/home/role.rtrr/rrfs_b_nwges" #only needed by RTMA
+RRFS_PRODROOT="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"    # for RTMA with analysis of wind gust only
+COMIN_prod_rrfs="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"
 PYTHON_GRAPHICS_YML_FN="rtma.yml"
 POST_FULL_MODEL_NAME="FV3R"
 POST_SUB_MODEL_NAME="RTMA"
@@ -244,8 +242,6 @@ MODEL="RTMA_B" #used by NCL
 RUN="RTMA_NA"
 #RTMA_OBS_FEED="NCO"
 #OBSPATH="/lfs4/BMC/wrfruc/gge/rtma/wcoss_obs"
-RRFS_PRODROOT="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"      # <-- on wcoss2 (need to change if on other machines)
-COMIN_prod_rrfs="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"      # <-- on wcoss2 (need to change if on other machines)
 
 STMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/stmp"
 PTMP="/lfs4/BMC/nrtrr/NCO_dirs/rtma.${version}/com" 
@@ -273,7 +269,9 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
   PARTITION_GRAPHICS=""
   PARTITION_POST=""
   PARTITION_PRDGEN=""
-  DO_BUFRSND="TRUE"
+  DO_BUFRSND="FALSE"
+  DO_HOWV="FALSE"
+  DO_GUST="FALSE"
 # RTMA_OBS_FEED="NCO" # comment out as RTMA will try to use the rtma_ru obs if set to NCO (wcoss2)
   binary_diag=.true.
 
@@ -317,18 +315,14 @@ if [[ "$MACHINE" == "wcoss2" ]]; then
   WRTCMP_write_tasks_per_group="128"
 
   FG_ROOTDIR="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/nwges"
+  RRFS_PRODROOT="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"         # for RTMA with analysis of wind gust only
+  COMIN_prod_rrfs="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"
   OBSPATH="/lfs/h1/ops/prod/com/obsproc/v1.2"
   ENKF_FCST="/lfs/h1/ops/prod/com/gfs/v16.3"
   LIGHTNING_ROOT="/lfs/h1/ops/prod/com/obsproc/v1.2"
-  RRFS_PRODROOT="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"
-  COMIN_prod_rrfs="/lfs/h2/emc/ptmp/emc.lam/rrfs/na/prod"
 
   STMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}/stmp"
   PTMP="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}"
   NWGES="/lfs/h2/emc/ptmp/${USER}/3D-RTMA/rtma.${version}/nwges"
-
-  DO_HOWV="TRUE"
-  DO_GUST="TRUE"
-
 fi
 

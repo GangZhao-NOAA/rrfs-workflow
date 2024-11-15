@@ -1260,10 +1260,10 @@ if [[ "${NET}" == "RTMA"* ]] && [[ "${MACHINE,,}" == "wcoss2" ]] && [[ "${BKTYPE
   # input grib2 format data file in which the original field on Rotated LatLon (RLL) grid is stored
    rm -f ./input_data_rll.grib2
    bkpath_howvgust=${cycle_dir}/process_howvgust
-   if [[ -f ${bkpath_howvgust}/ww3.guess.grb2 ]] ; then
+   if [[ -f ${bkpath_howvgust}/ww3.guess.grib2 ]] ; then
       print_info_msg "VERBOSE" "found wave height firstguess on RLL grid and 
                       then regrid it to ESG grid for analysis"
-      ln -sf ${bkpath_howvgust}/ww3.guess.grb2      ./input_data_rll.grib2
+      ln -sf ${bkpath_howvgust}/ww3.guess.grib2      ./input_data_rll.grib2
 
       # set up the namelist for regrdding
       rm -f ./rll2esg_namelist
@@ -1280,13 +1280,13 @@ EOF
       . prep_step
       ${APRUN} ${EXECdir}/$pgm  >>$pgmout 2>errfile
       export err=$?; err_chk
-      mv errfile errfile_regrid_rll2esg_howv
+      mv errfile errfile_regrid_rll2esg_${varname}
       print_info_msg "VERBOSE" "Successfully regridding the firstguess of wave height (howv) \
                      from RLL grid to ESG grid. "
       # write out the HOWV field (on ESG grid) to a separate netcdf file which would be used 
       # for the incremental interpolation in the postanal step (JRRFS_RUN_POSTANAL/exrrfs_run_postanal.sh)
       rm -f ./sfc_data_esg_fgs_${varname}.nc
-      ncks -c -O -v slmsk,howv ./sfc_data.nc ./sfc_data_esg_fgs_${varname}.nc
+      ncks -c -O -v slmsk,${varname} ./sfc_data.nc ./sfc_data_esg_fgs_${varname}.nc
       if [ $? -ne 0 ] ; then
           print_info_msg "VERBOSE" "WARNING --> Failed to write out ${varname} \
                           firstguess into a netcdffile with ncks"
@@ -1326,10 +1326,10 @@ if [[ "${NET}" == "RTMA"* ]] && [[ "${BKTYPE}" -eq 0 ]] && [[ "${DO_GUST^^}" == 
   # input grib2 format data file in which the original field on Rotated LatLon (RLL) grid is stored
    rm -f ./input_data_rll.grib2
    bkpath_howvgust=${cycle_dir}/process_howvgust
-   if [[ -f ${bkpath_howvgust}/ww3.guess.grb2 ]] ; then
-      print_info_msg "VERBOSE" "found wave height firstguess on RLL grid and 
+   if [[ -f ${bkpath_howvgust}/gust.guess.grib2 ]] ; then
+      print_info_msg "VERBOSE" "found 10-m wind gust firstguess on RLL grid and 
                       then regrid it to ESG grid for analysis"
-      ln -sf ${bkpath_howvgust}/gust.guess.grb2      ./input_data_rll.grib2
+      ln -sf ${bkpath_howvgust}/gust.guess.grib2      ./input_data_rll.grib2
 
       # set up the namelist for regrdding
       rm -f ./rll2esg_namelist
@@ -1346,13 +1346,13 @@ EOF
       . prep_step
       ${APRUN} ${EXECdir}/$pgm  >>$pgmout 2>errfile
       export err=$?; err_chk
-      mv errfile errfile_regrid_rll2esg_gust
+      mv errfile errfile_regrid_rll2esg_${varname}
       print_info_msg "VERBOSE" "Successfully regridding the firstguess of wind gust (gust) \
                      from RLL grid to ESG grid. "
       # write out the HOWV field (on ESG grid) to a separate netcdf file which would be used 
       # for the incremental interpolation in the postanal step (JRRFS_RUN_POSTANAL/exrrfs_run_postanal.sh)
       rm -f ./sfc_data_esg_fgs_${varname}.nc
-      ncks -c -O -v slmsk,howv ./sfc_data.nc ./sfc_data_esg_fgs_${varname}.nc
+      ncks -c -O -v slmsk,${varname} ./sfc_data.nc ./sfc_data_esg_fgs_${varname}.nc
       if [ $? -ne 0 ] ; then
           print_info_msg "VERBOSE" "WARNING --> Failed to write out ${varname} \
                           firstguess into a netcdffile with ncks"
