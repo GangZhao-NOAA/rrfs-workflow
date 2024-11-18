@@ -206,8 +206,8 @@ grid_specs=${grid_specs_rrfsnarll}
 
          GL_InputGribmerge=' -i ww3GL.guess.grib2 '
 
-#        echo "export ww3CYCLE_GL=$ww3CYCLE_GL" >> $COMOUT/urma2p5.t${cyc}z.envir.sh
-#        echo "export ww3FHH_GL=$ww3FHH_GL" >> $COMOUT/urma2p5.t${cyc}z.envir.sh
+         echo "export ww3CYCLE_GL=$ww3CYCLE_GL" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
+         echo "export ww3FHH_GL=$ww3FHH_GL" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
 
          found_ww3gesGL=yes
 
@@ -253,6 +253,7 @@ grid_specs=${grid_specs_rrfsnarll}
          cpreq ${probe_ww3_guess_grb2[1]} ww3.guess1.grib2
 #        cp -p ${probe_ww3_guess_grb2[1]} ww3.guess1.grib2
 
+         # save gfswave forecast files to $COMOUT
          cp -p ${probe_ww3_guess_grb2[0]} $COMOUT/gfswave.t${ww3CC}z.arctic.9km.f${ww3FHH}.grib2     # save for retro run
          cp -p ${probe_ww3_guess_grb2[1]} $COMOUT/gfswave.t${ww3CC}z.global.0p16.f${ww3FHH}.grib2     # save for retro run
 
@@ -261,8 +262,8 @@ grid_specs=${grid_specs_rrfsnarll}
                         -m slmask.grib2 \
                         -o ww3.guess.grib2
  
-#        echo "export ww3CYCLE=$ww3CYCLE" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
-#        echo "export ww3FHH=$ww3FHH" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
+         echo "export ww3CYCLE=$ww3CYCLE" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
+         echo "export ww3FHH=$ww3FHH" >> $COMOUT/${RUN}.t${cyc}z.envir.sh
          found_ww3ges=yes
          break
       else
@@ -276,12 +277,13 @@ gfs.${ww3PDY}/${ww3CC}/wave/gridded/gfswave.t${ww3CC}z.global.0p16.f${ww3FHH}.gr
 queried in the above while-do-loop."
    fi
 
-   # cp -p ww3.guess.grib2 $COMOUT/rrfs.t${HH}z.ww3.guess.3drtma.grib2
-   cp -p ww3.guess.grib2 $COMOUT/rrfs.3drtma.t${HH}z.fgs.howv.grib2
+   # save the firstguess grib2 file to $COMOUT
+   cp -p ww3.guess.grib2 $COMOUT/rtma.t${ww3CC}z.fgs.howv.f${ww3FHH}.grib2       # forecast time saved in name of firstguess file
+   cp -p ww3.guess.grib2 $COMOUT/rtma.t${HH}z.fgs.howv.grib2                     # analysis time saved in name of firstguess file
 #
 #-----------------------------------------------------------------------
 #
-# looking for firstguess of Wind Gust (from 1-h forecast grib2 file of RRFS)
+# looking for firstguess of Wind Gust (from 0~3 hour forecast grib2 file of RRFS)
 #
 #-----------------------------------------------------------------------
 #
@@ -306,8 +308,9 @@ queried in the above while-do-loop."
          # wgrib2 ./rrfs_guess.grib2 -match ":GUST:surface" -grib ./gust.guess.grib2
          wgrib2 ./rrfs_guess.grib2 -match "${FHH_string}" -grib ./gust.guess.grib2
          export err=$?; err_chk
-         # cp -p ./gust.guess.grib2    $COMOUT/rrfs.t${PRE_HH}z.gust.sfc.f${ic3}.grib2
-         cp -p ww3.guess.grib2 $COMOUT/rrfs.3drtma.t${HH}z.fgs.gust.grib2
+         # save the firstguess grib2 file to $COMOUT
+         cp -p ./gust.guess.grib2 $COMOUT/rtma.t${PRE_HH}z.fgs.gust.f${ic3}.grib2    # forecast time saved in name of firstguess file
+         cp -p ./gust.guess.grib2 $COMOUT/rtma.t${HH}z.fgs.gust.grib2                # analysis time saved in name of firstguess file
 
          found_gustges=yes
 

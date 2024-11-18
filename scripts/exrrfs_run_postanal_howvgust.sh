@@ -187,7 +187,8 @@ if [[ "${NET}" == "RTMA"* ]] && [[ "${BKTYPE}" -eq 0 ]] ; then
       # input grib2 format data file in which the original field on Rotated LatLon (RLL) grid is stored
       rm -f ./input_data_rll.grib2
       bkpath_howvgust=${cycle_dir}/process_howvgust
-      ln -sf ${bkpath_howvgust}/ww3.guess.grib2                      ./input_data_rll.grib2
+      ln -sf ${bkpath_howvgust}/ww3.guess.grib2                    ./input_data_rll.grib2
+      # ln -sf ${COMOUT}/rtma.t${HH}z.fgs.howv.grib2               ./input_data_rll.grib2
 
       #-- linking the fv3-lam grid specification file (fixed file for RRFS_NA_3km_c3463)
       rm -f ./fv3_grid_spec_esg.nc
@@ -240,7 +241,7 @@ EOF
       #-- Note: need the grib2 template file (using the original firstguess grib2 file on RLL grid)
       bkpath_howvgust=${cycle_dir}/process_howvgust
       if [[ -f ${bkpath_howvgust}/ww3.guess.grib2 ]] ; then
-         print_info_msg "VERBOSE" "found wave height firstguess on RLL grid and 
+         print_info_msg "VERBOSE" "found wave height firstguess on RLL grid and
                          use it as grib2 template."
          ln -sf ${bkpath_howvgust}/ww3.guess.grib2      ./grb2_tmplate_${varname}.grib2
          # 1. netcdf --> binary (using ncks)
@@ -261,7 +262,9 @@ EOF
          wgrib2 ./grb2_tmplate_${varname}.grib2 -import_bin ./sfc_data_rll_anl_${varname}_bin.dat -no_header -set_var ${varname_grb} -set_ftime "anl" -set_date ${adate} -undefine_val -9999.  -set_lev "${level_info}" -set_grib_type $grib_type ${scaling_set} -grib_out ./${grib2_fname}
          export err=$?; err_chk
          print_info_msg "VERBOSE" "Successfully convert netcdf file to grib2 file for ${varname}."
-         cp -p ./${grib2_fname}     ${COMOUT}/rrfs.3drtma.t${HH}z.anl.howv.grib2     
+         # save the analysis file (grib2) to $COMOUT
+         cp -p ./${grib2_fname}     ${COMOUT}/rtma.t${HH}z.anl.howv.f000.grib2     
+         cp -p ./${grib2_fname}     ${COMOUT}/rtma.t${HH}z.anl.howv.grib2     
       else
          print_info_msg "VERBOSE" "Could NOT find the grbi2 template file for ${varname}.  \
                          Skipping the conversion from netcdf to grib2 for ${varname}."
@@ -285,6 +288,7 @@ EOF
       rm -f ./input_data_rll.grib2
       bkpath_howvgust=${cycle_dir}/process_howvgust
       ln -sf ${bkpath_howvgust}/gust.guess.grib2                      ./input_data_rll.grib2
+      # ln -sf ${COMOUT}/rtma.t${HH}z.fgs.gust.grib2                  ./input_data_rll.grib2
 
       #-- linking the fv3-lam grid specification file (fixed file for RRFS_NA_3km_c3463)
       rm -f ./fv3_grid_spec_esg.nc
@@ -358,7 +362,9 @@ EOF
          wgrib2 ./grb2_tmplate_${varname}.grib2 -import_bin ./sfc_data_rll_anl_${varname}_bin.dat -no_header -set_var ${varname_grb} -set_ftime "anl" -set_date ${adate} -undefine_val -9999.  -set_lev "${level_info}" -set_grib_type $grib_type ${scaling_set} -grib_out ./${grib2_fname}
          export err=$?; err_chk
          print_info_msg "VERBOSE" "Successfully convert netcdf file to grib2 file for ${varname}."
-         cp -p ./${grib2_fname}     ${COMOUT}/rrfs.3drtma.t${HH}z.anl.gust.grib2     
+         # save analysis file (grib2) to $COMOUT
+         cp -p ./${grib2_fname}     ${COMOUT}/rtma.t${HH}z.anl.gust.f000.grib2     
+         cp -p ./${grib2_fname}     ${COMOUT}/rtma.t${HH}z.anl.gust.grib2     
       else
          print_info_msg "VERBOSE" "Could NOT find the grbi2 template file for ${varname}.  \
                          Skipping the conversion from netcdf to grib2 for ${varname}."
