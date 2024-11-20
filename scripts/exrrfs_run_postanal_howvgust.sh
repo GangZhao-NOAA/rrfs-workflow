@@ -198,6 +198,7 @@ if [[ "${NET}" == "RTMA"* ]] && [[ "${BKTYPE}" -eq 0 ]] ; then
       #-- linking the analysis file of surface fields (netcdf format), 
       # including the 2-D fields (HOWV and Wind Gust) on ESG grid
       # which would be regridded from ESG grid to RLL grid
+      rm -f ./input_data_esg.nc
       #ln -sf ./fv3_sfcdata                                   ./input_data_esg.nc
       ln -sf ${bkpath}/sfc_data.nc                           ./input_data_esg.nc
    
@@ -205,6 +206,7 @@ if [[ "${NET}" == "RTMA"* ]] && [[ "${BKTYPE}" -eq 0 ]] ; then
       if [ -f ${bkpath}/sfc_data_esg_fgs_${varname}.nc ] ; then
          print_info_msg "VERBOSE" "using incremental interpolation in regridding ${varname} from ESG to RLL"
          flag_increment_intrp=".true."
+         rm -f ./input_data_esg_fgs.nc
          ln -sf ${bkpath}/sfc_data_esg_fgs_${varname}.nc                  ./input_data_esg_fgs.nc
       else
          print_info_msg "VERBOSE" "using full variable interpolation in regridding ${varname} from ESG to RLL"
@@ -212,7 +214,7 @@ if [[ "${NET}" == "RTMA"* ]] && [[ "${BKTYPE}" -eq 0 ]] ; then
       fi
 
       #-- output_data_rll.nc      --> netcdf file which stores the "new(e.g., analysis)" field on RLL grid
-      rm -f ./output_data_rll.nc
+      rm -f ./output_data_rll.nc    ./sfc_data_rll_anl_${varname}.nc
       ln -sf ./sfc_data_rll_anl_${varname}.nc   ./output_data_rll.nc
 
       # set up the namelist for regrdding
@@ -243,6 +245,7 @@ EOF
       if [[ -f ${bkpath_howvgust}/ww3.guess.grib2 ]] ; then
          print_info_msg "VERBOSE" "found wave height firstguess on RLL grid and
                          use it as grib2 template."
+         rm -f ./grb2_tmplate_${varname}.grib2
          ln -sf ${bkpath_howvgust}/ww3.guess.grib2      ./grb2_tmplate_${varname}.grib2
          # 1. netcdf --> binary (using ncks)
          rm -f ./sfc_data_rll_anl_${varname}_bin.dat ./tmp_${varname}.nc
@@ -251,6 +254,7 @@ EOF
 
          # convert real8 to real4 in binary file (the binary write-out of ncks is in real-8, wgrib2 only handles real-4)
          cp -p ${HOMEscript}/convert_r8tor4.py   ./
+         rm -f ./sfc_data_rll_anl_${varname}_bin_r8.dat
          mv ./sfc_data_rll_anl_${varname}_bin.dat ./sfc_data_rll_anl_${varname}_bin_r8.dat
          python ./convert_r8tor4.py -v -i ./sfc_data_rll_anl_${varname}_bin_r8.dat -o ./sfc_data_rll_anl_${varname}_bin.dat
          # binary --> netcdf (wgrib2)
@@ -298,6 +302,7 @@ EOF
       #-- linking the analysis file of surface fields (netcdf format), 
       # including the 2-D fields (HOWV and Wind Gust) on ESG grid
       # which would be regridded from ESG grid to RLL grid
+      rm -f ./input_data_esg.nc
       #ln -sf ./fv3_sfcdata                                   ./input_data_esg.nc
       ln -sf ${bkpath}/sfc_data.nc                           ./input_data_esg.nc
    
@@ -305,6 +310,7 @@ EOF
       if [ -f ${bkpath}/sfc_data_esg_fgs_${varname}.nc ] ; then
          print_info_msg "VERBOSE" "using incremental interpolation in regridding ${varname} from ESG to RLL"
          flag_increment_intrp=".true."
+         rm -f ./input_data_esg_fgs.nc
          ln -sf ${bkpath}/sfc_data_esg_fgs_${varname}.nc                  ./input_data_esg_fgs.nc
       else
          print_info_msg "VERBOSE" "using full variable interpolation in regridding ${varname} from ESG to RLL"
@@ -312,7 +318,7 @@ EOF
       fi
 
       #-- output_data_rll.nc      --> netcdf file which stores the "new(e.g., analysis)" field on RLL grid
-      rm -f ./output_data_rll.nc
+      rm -f ./output_data_rll.nc    ./sfc_data_rll_anl_${varname}.nc
       ln -sf ./sfc_data_rll_anl_${varname}.nc   ./output_data_rll.nc
 
       # set up the namelist for regrdding
@@ -343,6 +349,7 @@ EOF
       if [[ -f ${bkpath_howvgust}/gust.guess.grib2 ]] ; then
          print_info_msg "VERBOSE" "found wind gust firstguess on RLL grid and 
                          use it as grib2 template."
+         rm -f ./grb2_tmplate_${varname}.grib2
          ln -sf ${bkpath_howvgust}/gust.guess.grib2      ./grb2_tmplate_${varname}.grib2
          # 1. netcdf --> binary (using ncks)
          rm -f ./sfc_data_rll_anl_${varname}_bin.dat    ./tmp_${varname}.nc
@@ -351,6 +358,7 @@ EOF
 
          # convert real8 to real4 in binary file (the binary write-out of ncks is in real-8, wgrib2 only handles real-4)
          cp -p ${HOMEscript}/convert_r8tor4.py   ./
+         rm -f ./sfc_data_rll_anl_${varname}_bin_r8.dat
          mv ./sfc_data_rll_anl_${varname}_bin.dat ./sfc_data_rll_anl_${varname}_bin_r8.dat
          python ./convert_r8tor4.py -v -i ./sfc_data_rll_anl_${varname}_bin_r8.dat -o ./sfc_data_rll_anl_${varname}_bin.dat
          # binary --> netcdf (wgrib2)
